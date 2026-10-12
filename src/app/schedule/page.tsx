@@ -1,0 +1,12 @@
+import { CalendarClock, Clock3 } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { mockAnime, scheduleSamples } from "@/data/mock-anime";
+
+export const metadata = { title: "Anime Schedule — AniFrame", description: "Anime release schedule. Sample entries are not verified live release times." };
+
+const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+export default function SchedulePage() {
+  return <div className="mx-auto max-w-[1440px] px-4 pb-16 pt-10 sm:px-7 lg:px-10"><p className="eyebrow"><CalendarClock size={12} /> WEEKLY LINEUP</p><h1 className="font-display text-3xl font-bold text-white sm:text-4xl">Release schedule<span className="text-violet-300">.</span></h1><p className="mt-2 max-w-2xl text-sm leading-6 text-slate-400">Sample schedule cards below are for interface preview only. Release days and times have not been verified; no live release time is claimed.</p><div className="mt-7 space-y-4">{days.map((day) => { const entries = scheduleSamples.filter((entry) => entry.day === day); return <section className="rounded-2xl border border-white/[.06] bg-white/[.02] p-4" key={day}><h2 className="font-display text-sm font-bold text-white">{day}</h2>{entries.length ? <div className="mt-3 grid gap-2 sm:grid-cols-2">{entries.map((entry) => { const anime = mockAnime.find((item) => item.id === entry.animeId); return anime ? <Link className="flex items-center gap-3 rounded-xl border border-white/[.05] bg-white/[.025] p-2.5 hover:bg-white/[.05]" href={`/anime/${anime.slug}`} key={entry.animeId}><span className="relative block size-12 shrink-0 overflow-hidden rounded-lg bg-slate-800">{anime.posterImage && <Image alt="" className="object-cover" fill sizes="48px" src={anime.posterImage} />}</span><span className="min-w-0 flex-1"><span className="block truncate text-xs font-semibold text-slate-200">{anime.title}</span><span className="mt-1 block text-[10px] text-slate-400">{entry.episode}</span><span className="mt-1 flex items-center gap-1 text-[9px] text-amber-200/70"><Clock3 size={10} /> {entry.time}</span></span><span className="text-[9px] text-slate-500">{entry.timezone}</span></Link> : null; })}</div> : <p className="mb-0 mt-2 text-[10px] text-slate-600">No sample release listed.</p>}</section>; })}</div><p className="mt-4 text-[10px] text-slate-600">Times are intentionally labeled as unverified sample data until a permitted schedule source is configured.</p><div className="sr-only">{mockAnime.length} demo anime available</div></div>;
+}

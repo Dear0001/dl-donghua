@@ -1,0 +1,71 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Anime {
+  id          String       @id @default(cuid())
+  title       String
+  alternativeTitles String[] @default([])
+  slug        String       @unique
+  synopsis    String?
+  posterUrl   String?
+  coverUrl    String?
+  status      String       @default("UNKNOWN")
+  type        String       @default("TV")
+  rating      Float?
+  releaseYear Int?
+  season      String?
+  studio      String?
+  tags        String[]     @default([])
+  sourceUrl   String       @unique
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  episodes    Episode[]
+  genres      AnimeGenre[]
+
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin)
+  @@index([updatedAt])
+}
+
+model Episode {
+  id            String   @id @default(cuid())
+  animeId       String
+  episodeNumber Int
+  title         String
+  synopsis      String?
+  thumbnailUrl  String?
+  sourceUrl     String?
+  duration      Int?
+  releaseDate   DateTime?
+  audioLanguages String[] @default([])
+  subtitles     Json?
+  videoSources  Json?
+  playbackUrl   String?
+  createdAt     DateTime @default(now())
+  anime         Anime    @relation(fields: [animeId], references: [id], onDelete: Cascade)
+
+  @@unique([animeId, episodeNumber])
+  @@index([animeId])
+}
+
+model Genre {
+  id     String       @id @default(cuid())
+  name   String       @unique
+  slug   String       @unique
+  anime  AnimeGenre[]
+}
+
+model AnimeGenre {
+  animeId String
+  genreId String
+  anime   Anime  @relation(fields: [animeId], references: [id], onDelete: Cascade)
+  genre   Genre  @relation(fields: [genreId], references: [id], onDelete: Cascade)
+
+  @@id([animeId, genreId])
+  @@index([genreId])
+}
